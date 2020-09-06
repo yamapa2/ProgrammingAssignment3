@@ -57,15 +57,26 @@ levels(ytest$Activity) <- activitylabels
 stest <- read.table("data/UCI HAR Dataset/test/subject_test.txt")
 names(stest) <- c("Subject")
 
-## Combine all the data sets into a single data frame
-tidydata <- rbind(cbind(xtrain, ytrain, strain), cbind(xtest, ytest, stest))
+## Combine all the data sets into a single data frame (Subject, Activity and Measurements)
+tidydata <- rbind(cbind(strain, ytrain, xtrain), cbind(stest, ytest, xtest))
 
 ## Create a tidy folder to save all the tidy data
 if(!file.exists("tidy"))
     dir.create("tidy")
 
 ## Write tidy data
-write.table(tidydata, "tidy/tidydata.txt")
+write.table(tidydata, "tidy/tidydata.txt", row.names = FALSE)
+
+library(reshape2)
+
+## Melt the tidy data set keeping the Subject and Activity
+tdmelted <- melt(tidydata, id = c("Subject", "Activity"))
+
+## Summarize melted data with dcast using "mean" aggregation
+avgdata <- dcast(tdmelted, Subject + Activity ~ variable, mean)
+
+## Write second tidy data (summarized averages of each variable for each activity and each subject)
+write.table(avgdata, "tidy/avgdata.txt", row.names = FALSE)
 
 ## Create code book
 tdfdescr <- sapply(efnamesorig, function(f) {
@@ -78,14 +89,3 @@ tidyfeatures <- data.frame(1:dim(tidydata)[2], names(tidydata), tdfdescr)
 
 ## Write out (codebook)
 write.table(tidyfeatures, "tidy/features.txt", quote = FALSE, row.names = FALSE, col.names = FALSE)
-
-library(reshape2)
-
-## Melt the tidy data set keeping the Subject and Activity
-tdmelted <- melt(tidydata, id = c("Subject", "Activity"))
-
-## Summarize melted data with dcast using "mean" aggregation
-avgdata <- dcast(tdmelted, Subject + Activity ~ variable, mean)
-
-## Write second tidy data (summarized averages of each variable for each activity and each subject)
-write.table(avgdata, "tidy/avgdata.txt")
