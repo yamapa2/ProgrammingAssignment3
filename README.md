@@ -1,9 +1,4 @@
----
-title: "Human Activity Recognition Using Smartphones Dataset (Tidy) v1.0"
-output:
-  html_document: default
-  pdf_document: default
----
+# Human Activity Recognition Using Smartphones Dataset (Tidy) v1.0
 
 ## Contents
 - **README.txt**: This file.
